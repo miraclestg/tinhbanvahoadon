@@ -58,7 +58,7 @@ const D: Record<Lang, Dict> = {
     cat_food: 'Ăn uống', cat_transport: 'Đi lại', cat_stay: 'Chỗ ở', cat_fun: 'Vui chơi', cat_shop: 'Mua sắm', cat_other: 'Khác',
   },
   en: {
-    app: 'Split Trip',
+    app: 'Friends & Bills',
     themeLight: 'Switch to light mode', themeDark: 'Switch to dark mode',
     footerLinks: 'Quick Links', footerHome: 'Home',
     footerBuiltWith: 'Built With', footerRights: 'All rights reserved.',
