@@ -2,23 +2,31 @@ import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 
 const technologies = ['React', 'TypeScript', 'Tailwind CSS', 'Vite'];
-const eggOffsets = [
-  [0, 0],
-  [36, -24],
-  [-36, 24],
-  [60, 38],
-  [-60, -38],
-  [0, 58],
-  [0, -58],
-  [68, 0],
-  [-68, 0],
-] as const;
+const eggImages = [
+  { src: '/easter-egg.png', alt: 'Siêu Bá Khí', className: 'max-h-[80dvh] max-w-[calc(100vw-2rem)]' },
+  { src: '/easter-egg-story.png', alt: 'Easter egg story', className: 'max-h-[72dvh] max-w-[38vw]' },
+  { src: '/easter-egg-night.png', alt: 'Night trip photo', className: 'max-h-[80dvh] max-w-[54vw]' },
+  { src: '/easter-egg-food.png', alt: 'Food trip photo', className: 'max-h-[80dvh] max-w-[54vw]' },
+];
+
+interface EggRun {
+  id: number;
+  image: {
+    src: string;
+    alt: string;
+    left: number;
+    top: number;
+    className: string;
+  };
+}
 
 export function AppFooter() {
   const { t } = useI18n();
   const nextEggRun = useRef(0);
+  const eggImageOrder = useRef<number[]>([]);
+  const lastEggImage = useRef<number | null>(null);
   const activeSounds = useRef(new Set<HTMLAudioElement>());
-  const [eggRuns, setEggRuns] = useState<number[]>([]);
+  const [eggRuns, setEggRuns] = useState<EggRun[]>([]);
 
   useEffect(
     () => () => {
@@ -46,7 +54,35 @@ export function AppFooter() {
           aria-label={t('footerEasterEgg')}
           onClick={() => {
             playEggSound();
-            const run = nextEggRun.current++;
+            const id = nextEggRun.current++;
+            if (!eggImageOrder.current.length) {
+              eggImageOrder.current = eggImages.map((_, index) => index);
+              for (let i = eggImageOrder.current.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [eggImageOrder.current[i], eggImageOrder.current[j]] = [
+                  eggImageOrder.current[j],
+                  eggImageOrder.current[i],
+                ];
+              }
+              if (eggImageOrder.current[0] === lastEggImage.current) {
+                [eggImageOrder.current[0], eggImageOrder.current[1]] = [
+                  eggImageOrder.current[1],
+                  eggImageOrder.current[0],
+                ];
+              }
+            }
+            const imageIndex = eggImageOrder.current.shift();
+            if (imageIndex === undefined) return;
+            lastEggImage.current = imageIndex;
+            const image = eggImages[imageIndex];
+            const run: EggRun = {
+              id,
+              image: {
+                ...image,
+                left: 25 + Math.random() * 50,
+                top: 20 + Math.random() * 60,
+              },
+            };
             setEggRuns((runs) => [...runs, run]);
           }}
           className="absolute right-6 top-4 inline-flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:right-8 sm:top-6"
@@ -70,31 +106,28 @@ export function AppFooter() {
         </button>
         {eggRuns.length > 0 && (
           <div className="pointer-events-none fixed inset-0 z-[60] overflow-hidden">
-            {eggRuns.map((run) => {
-              const [offsetX, offsetY] = eggOffsets[run % eggOffsets.length];
-              return (
-                <div
-                  key={run}
-                  className="absolute"
-                  style={{
-                    left: `calc(50% + ${offsetX}px)`,
-                    top: `calc(50% + ${offsetY}px)`,
-                    transform: 'translate(-50%, -50%)',
+            {eggRuns.map(({ id, image }) => (
+              <div
+                key={id}
+                className="absolute"
+                style={{
+                  left: `${image.left}%`,
+                  top: `${image.top}%`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className={`egg-image-reveal ${image.className} rounded-xl object-contain shadow-2xl`}
+                  onAnimationEnd={(event) => {
+                    if (event.target === event.currentTarget) {
+                      setEggRuns((runs) => runs.filter((run) => run.id !== id));
+                    }
                   }}
-                >
-                  <img
-                    src="/easter-egg.png"
-                    alt="Siêu Bá Khí"
-                    className="egg-image-reveal max-h-[80dvh] max-w-[calc(100vw-2rem)] rounded-xl object-contain shadow-2xl"
-                    onAnimationEnd={(event) => {
-                      if (event.target === event.currentTarget) {
-                        setEggRuns((runs) => runs.filter((activeRun) => activeRun !== run));
-                      }
-                    }}
-                  />
-                </div>
-              );
-            })}
+                />
+              </div>
+            ))}
           </div>
         )}
         <div className="grid gap-8 sm:grid-cols-2">
