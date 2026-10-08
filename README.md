@@ -1,4 +1,4 @@
-# Tình Bạn Và Hóa Đơn, bản 2 (React + TypeScript + Tailwind + shadcn/ui)
+# Tình Bạn Và Hóa Đơn (React + TypeScript + Tailwind + shadcn/ui)
 
 Cùng tính năng và cùng định dạng dữ liệu Firestore với bản 1 (chuyến đi cũ vẫn mở được), giao diện làm lại theo phong cách shadcn/ui.
 
