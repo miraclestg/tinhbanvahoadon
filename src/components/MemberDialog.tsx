@@ -70,7 +70,7 @@ function MemberForm({ trip, member, onClose }: { trip: Trip; member: Member | nu
     <form onSubmit={submit} className="space-y-4">
       <div className="space-y-1.5">
         <Label>{t('name')}</Label>
-        <Input required value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+        <Input required value={name} onChange={(e) => setName(e.target.value)} />
       </div>
       <div className="space-y-1.5">
         <Label>{t('people')}</Label>
