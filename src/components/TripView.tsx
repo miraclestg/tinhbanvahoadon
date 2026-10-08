@@ -143,7 +143,7 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
       <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-emerald-400 to-sky-500 sm:rounded-b-3xl">
         {trip.bg && <img src={trip.bg} alt="" className="absolute inset-0 size-full object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/65" />
-        <div className="absolute inset-0 flex flex-col justify-between p-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white">
+        <div className="absolute inset-0 flex flex-col justify-between p-3 pt-[calc(max(0.75rem,env(safe-area-inset-top))+0.5rem)] text-white">
           <div className="flex items-center justify-between">
             <Button variant="glass" size="icon" onClick={() => (location.hash = '#/')} aria-label={t('back')}>
               <ArrowLeft />
