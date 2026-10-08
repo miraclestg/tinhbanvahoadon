@@ -5,7 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
 export default defineConfig({
-  base: './',
+  base: '/tinhbanvahoadon/',
   resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
   plugins: [
     react(),
@@ -15,9 +15,9 @@ export default defineConfig({
       includeAssets: ['icon-180.png'],
       manifest: {
         name: 'Tình Bạn Và Hóa Đơn',
-        short_name: 'Tình Bạn',
-        start_url: './',
-        scope: './',
+        short_name: 'Tình Bạn Và Hóa Đơn',
+        start_url: '/tinhbanvahoadon/',
+        scope: '/tinhbanvahoadon/',
         display: 'standalone',
         background_color: '#f5f6f8',
         theme_color: '#1fa88e',
