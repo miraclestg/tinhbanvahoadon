@@ -1,11 +1,11 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Phiên bản đơn giản: ai biết ID chuyến đi (chuỗi ngẫu nhiên 12 ký tự) mới đọc/ghi được.
-    // Không cho liệt kê toàn bộ chuyến đi.
     match /trips/{tripId} {
+      // Access control is handled by the client UI; anyone with the trip ID can write.
       allow get, create, update, delete: if true;
       allow list: if false;
+
       match /photos/{photoId} {
         allow get, create, update, delete: if true;
         allow list: if false;

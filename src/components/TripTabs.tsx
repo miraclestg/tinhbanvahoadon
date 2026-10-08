@@ -94,7 +94,7 @@ export function ExpensesTab({ trip, onOpen }: { trip: Trip; onOpen: (e: Expense)
 }
 
 // ---------------------------------------------------------------- Ai nợ ai
-export function BalancesTab({ trip, canEdit }: { trip: Trip; canEdit: boolean }) {
+export function BalancesTab({ trip, canEdit, memberId }: { trip: Trip; canEdit: boolean; memberId?: string }) {
   const { t } = useI18n();
   const { saveTrip } = useTrips();
   const net = computeNet(trip);
@@ -117,6 +117,7 @@ export function BalancesTab({ trip, canEdit }: { trip: Trip; canEdit: boolean })
 
   async function markPaid(i: number) {
     const x = moves[i];
+    if (!x || (!canEdit && memberId !== x.from)) return;
     await saveTrip(
       { ...trip, payments: [...trip.payments, { id: uid(), from: x.from, to: x.to, amount: x.amount, datetime: nowLocal() }] },
       t('logPay', nameOf(trip, x.from), nameOf(trip, x.to), fmt(x.amount))
@@ -153,7 +154,7 @@ export function BalancesTab({ trip, canEdit }: { trip: Trip; canEdit: boolean })
                 <Button variant="outline" size="sm" onClick={() => remind(i)}>
                   <Bell /> {t('remind')}
                 </Button>
-                {canEdit && (
+                {(canEdit || memberId === x.from) && (
                   <Button size="sm" onClick={() => markPaid(i)}>
                     <Check /> {t('markPaid')}
                   </Button>

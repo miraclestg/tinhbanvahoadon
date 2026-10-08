@@ -5,6 +5,7 @@ import { BgCropper } from '@/components/BgCropper';
 import { ExpenseDetail } from '@/components/ExpenseDetail';
 import { ExpenseDialog } from '@/components/ExpenseDialog';
 import { MemberDialog } from '@/components/MemberDialog';
+import { MemberVerificationDialog } from '@/components/MemberVerificationDialog';
 import { ShareDialog } from '@/components/ShareDialog';
 import { BalancesTab, ExpensesTab, HistoryTab, MembersTab, StatsTab } from '@/components/TripTabs';
 import { Button } from '@/components/ui/button';
@@ -19,18 +20,21 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
   const { trips, editable, keys, ready, openTrip, saveTrip, removeTrip } = useTrips();
   const trip = trips[id];
   const canEdit = !!editable[id];
+  const editAccessChecked = Object.prototype.hasOwnProperty.call(editable, id);
 
   const [tab, setTab] = useState('expenses');
   const [expenseDlg, setExpenseDlg] = useState<{ open: boolean; expense: Expense | null }>({ open: false, expense: null });
   const [detail, setDetail] = useState<Expense | null>(null);
   const [memberDlg, setMemberDlg] = useState<{ open: boolean; member: Member | null }>({ open: false, member: null });
+  const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [crop, setCrop] = useState<{ open: boolean; src: string | null }>({ open: false, src: null });
   const fileRef = useRef<HTMLInputElement>(null);
   const objUrl = useRef<string | null>(null);
 
   useEffect(() => {
-    if (ready) openTrip(id, editKey);
+    if (!ready) return;
+    openTrip(id, editKey);
   }, [ready, id, editKey, openTrip]);
 
   useEffect(
@@ -90,6 +94,14 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
       toast.error(t('deleteFailed'));
     }
   };
+
+  async function registerMember(memberId: string, verification: NonNullable<Member['verification']>) {
+    const members = trip.members.map((member) =>
+      member.id === memberId ? { ...member, verification } : member
+    );
+    if (!members.some((member) => member.id === memberId)) throw new Error('Thành viên không còn trong chuyến đi.');
+    await saveTrip({ ...trip, members });
+  }
 
   return (
     <div className="pb-28">
@@ -174,7 +186,7 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
             <ExpensesTab trip={trip} onOpen={setDetail} />
           </TabsContent>
           <TabsContent value="balances">
-            <BalancesTab trip={trip} canEdit={canEdit} />
+            <BalancesTab trip={trip} canEdit={canEdit} memberId={activeMemberId ?? undefined} />
           </TabsContent>
           <TabsContent value="stats">
             <StatsTab trip={trip} />
@@ -225,6 +237,12 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
         member={memberDlg.member}
         open={memberDlg.open}
         onOpenChange={(o) => setMemberDlg((s) => ({ ...s, open: o }))}
+      />
+      <MemberVerificationDialog
+        trip={trip}
+        open={editAccessChecked && !canEdit && !activeMemberId && trip.members.length > 0}
+        onVerify={setActiveMemberId}
+        onRegister={registerMember}
       />
       <ShareDialog
         open={shareOpen}

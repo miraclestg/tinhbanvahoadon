@@ -47,6 +47,7 @@ function MemberForm({ trip, member, onClose }: { trip: Trip; member: Member | nu
       name: n,
       people: Math.max(1, Math.round(Number(people)) || 1),
       note: note.trim(),
+      ...(member?.verification ? { verification: member.verification } : {}),
     };
     const members = member ? trip.members.map((m) => (m.id === next.id ? next : m)) : [...trip.members, next];
     await saveTrip({ ...trip, members }, t(member ? 'logMemEdit' : 'logMemAdd', n));

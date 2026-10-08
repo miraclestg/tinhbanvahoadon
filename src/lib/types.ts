@@ -8,6 +8,10 @@ export interface Member {
   /** Số người trong "hộ". 1 = cá nhân */
   people: number;
   note: string;
+  verification?: {
+    question: string;
+    answerHash: string;
+  };
 }
 
 export interface Payer {
