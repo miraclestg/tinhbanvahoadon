@@ -11,11 +11,12 @@ import { sha256 } from '@/lib/utils';
 interface Props {
   trip: Trip;
   open: boolean;
+  onOpenChange: (open: boolean) => void;
   onVerify: (memberId: string) => void;
   onRegister: (memberId: string, verification: NonNullable<Member['verification']>) => Promise<void>;
 }
 
-export function MemberVerificationDialog({ trip, open, onVerify, onRegister }: Props) {
+export function MemberVerificationDialog({ trip, open, onOpenChange, onVerify, onRegister }: Props) {
   const { t } = useI18n();
   const [selectedId, setSelectedId] = useState(trip.members[0]?.id ?? '');
   const [question, setQuestion] = useState('');
@@ -52,8 +53,8 @@ export function MemberVerificationDialog({ trip, open, onVerify, onRegister }: P
   }
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent onEscapeKeyDown={(event) => event.preventDefault()} onPointerDownOutside={(event) => event.preventDefault()}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('memberVerifyTitle')}</DialogTitle>
           <DialogDescription>{t('memberVerifyDescription')}</DialogDescription>

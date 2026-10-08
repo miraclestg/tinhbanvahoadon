@@ -258,6 +258,9 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
       <MemberVerificationDialog
         trip={trip}
         open={editAccessChecked && !canEdit && !verifiedMemberId && trip.members.length > 0}
+        onOpenChange={(open) => {
+          if (!open) setTab('expenses');
+        }}
         onVerify={verifyMember}
         onRegister={registerMember}
       />
