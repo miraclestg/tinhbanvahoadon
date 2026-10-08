@@ -110,9 +110,9 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
 
   const onDeleteTrip = async () => {
     if (!confirm(t('confirmDel'))) return;
+    location.hash = '#/';
     try {
       await removeTrip(id);
-      location.hash = '#/';
     } catch (e) {
       console.warn('Không xóa được chuyến đi:', e);
       toast.error(t('deleteFailed'));
