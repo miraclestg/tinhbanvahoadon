@@ -33,6 +33,18 @@ export function TripsProvider({ children }: { children: ReactNode }) {
     if (!S.cloudOn() || watched.current.has(id)) return;
     watched.current.add(id);
     S.watchTrip(id, async (remote) => {
+      if (!remote) {
+        await S.removeLocalTrip(id);
+        setTrips((p) => {
+          const { [id]: _removed, ...rest } = p;
+          return rest;
+        });
+        setKeys((p) => {
+          const { [id]: _removed, ...rest } = p;
+          return rest;
+        });
+        return;
+      }
       const cur = tripsRef.current[id];
       if (cur && (cur.updatedAt || 0) > (remote.updatedAt || 0)) return;
       await S.set('trip:' + id, remote);
@@ -126,12 +138,16 @@ export function TripsProvider({ children }: { children: ReactNode }) {
 
   const removeTrip = useCallback(
     async (id: string) => {
-      if (editable[id]) S.removeCloudTrip(id);
+      if (editable[id]) await S.removeCloudTrip(id);
+      await S.removeLocalTrip(id);
       setTrips((p) => {
         const { [id]: _removed, ...rest } = p;
         return rest;
       });
-      await S.del('trip:' + id);
+      setKeys((p) => {
+        const { [id]: _removed, ...rest } = p;
+        return rest;
+      });
     },
     [editable]
   );

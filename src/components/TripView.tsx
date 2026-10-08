@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, History, ImageIcon, Languages, Moon, PieChart, Plus, Receipt, Scale, Share2, Sun, Users } from 'lucide-react';
+import { toast } from 'sonner';
 import { BgCropper } from '@/components/BgCropper';
 import { ExpenseDetail } from '@/components/ExpenseDetail';
 import { ExpenseDialog } from '@/components/ExpenseDialog';
@@ -81,8 +82,13 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
 
   const onDeleteTrip = async () => {
     if (!confirm(t('confirmDel'))) return;
-    await removeTrip(id);
-    location.hash = '#/';
+    try {
+      await removeTrip(id);
+      location.hash = '#/';
+    } catch (e) {
+      console.warn('Không xóa được chuyến đi:', e);
+      toast.error(t('deleteFailed'));
+    }
   };
 
   return (

@@ -49,6 +49,36 @@ export const del = (k: string) =>
     return undefined;
   });
 
+export async function removeLocalTrip(id: string): Promise<void> {
+  const d = await db();
+  await new Promise<void>((res, rej) => {
+    const tx = d.transaction('kv', 'readwrite');
+    const store = tx.objectStore('kv');
+    store.delete('trip:' + id);
+
+    const metaReq = store.get('meta') as IDBRequest<{ keys: Record<string, string> } | undefined>;
+    metaReq.onsuccess = () => {
+      const meta = metaReq.result;
+      if (meta?.keys?.[id]) {
+        const { [id]: _removed, ...keys } = meta.keys;
+        store.put({ ...meta, keys }, 'meta');
+      }
+    };
+
+    const cursorReq = store.openCursor();
+    cursorReq.onsuccess = () => {
+      const cursor = cursorReq.result;
+      if (!cursor) return;
+      if (String(cursor.key).startsWith(`photo:${id}:`)) cursor.delete();
+      cursor.continue();
+    };
+
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+    tx.onabort = () => rej(tx.error);
+  });
+}
+
 export async function allTrips(): Promise<Trip[]> {
   const d = await db();
   return new Promise((res, rej) => {
@@ -88,17 +118,19 @@ export function pushTrip(trip: Trip) {
   setDoc(doc(fdb, 'trips', trip.id), trip).catch((e) => console.warn(e));
 }
 
-export function removeCloudTrip(id: string) {
+export async function removeCloudTrip(id: string): Promise<void> {
   if (!fdb) return;
-  deleteDoc(doc(fdb, 'trips', id)).catch((e) => console.warn(e));
+  await deleteDoc(doc(fdb, 'trips', id));
 }
 
-export function watchTrip(id: string, cb: (t: Trip) => void): () => void {
+export function watchTrip(id: string, cb: (t: Trip | null) => void): () => void {
   if (!fdb) return () => {};
   return onSnapshot(
     doc(fdb, 'trips', id),
+    { includeMetadataChanges: true },
     (snap) => {
-      if (snap.exists()) cb(snap.data() as Trip);
+      if (!snap.exists() && (snap.metadata.fromCache || snap.metadata.hasPendingWrites)) return;
+      cb(snap.exists() ? (snap.data() as Trip) : null);
     },
     (e) => console.warn(e)
   );

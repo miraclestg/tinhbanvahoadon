@@ -15,7 +15,7 @@ export default defineConfig({
       includeAssets: ['icon-180.png'],
       manifest: {
         name: 'Tình Bạn Và Hóa Đơn',
-        short_name: 'Tình Bạn Và Hóa Đơn',
+        short_name: 'Split Bill',
         start_url: './',
         scope: './',
         display: 'standalone',

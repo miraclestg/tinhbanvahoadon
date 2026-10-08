@@ -28,6 +28,8 @@ Cần Node 18+.
 | `src/components/BgCropper.tsx` | Căn chỉnh ảnh nền |
 | `src/components/TripView.tsx`, `TripTabs.tsx` | Màn hình chuyến đi |
 
+Khi chuyến đi bị xóa trên Firestore, thiết bị người xem sẽ xóa bản sao IndexedDB và khóa chỉnh sửa khi nhận được cập nhật từ máy chủ. Thiết bị đang offline chỉ xóa bản sao sau khi kết nối lại và đồng bộ.
+
 Các thành phần trong `src/components/ui` được viết tay theo đúng mẫu của shadcn/ui (Radix + Tailwind + cva). Nếu muốn thêm thành phần khác, chạy `npx shadcn@latest init` rồi `npx shadcn@latest add <tên>`; alias `@/` đã cấu hình sẵn.
 
 ## Đưa lên mạng (cần https cho iPhone)
