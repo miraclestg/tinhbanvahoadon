@@ -12,7 +12,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-180.png'],
+      includeAssets: ['pets.png'],
       manifest: {
         name: 'Tình Bạn Và Hóa Đơn',
         short_name: 'Friends & Bills',
@@ -22,8 +22,7 @@ export default defineConfig({
         background_color: '#f5f6f8',
         theme_color: '#1fa88e',
         icons: [
-          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+          { src: 'pets.png', sizes: '512x512', type: 'image/png' },
         ],
       },
       workbox: { globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}'] },
