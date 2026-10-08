@@ -21,12 +21,13 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
   const trip = trips[id];
   const canEdit = !!editable[id];
   const editAccessChecked = Object.prototype.hasOwnProperty.call(editable, id);
+  const memberIdentityKey = `verified-member:${id}`;
 
   const [tab, setTab] = useState('expenses');
   const [expenseDlg, setExpenseDlg] = useState<{ open: boolean; expense: Expense | null }>({ open: false, expense: null });
   const [detail, setDetail] = useState<Expense | null>(null);
   const [memberDlg, setMemberDlg] = useState<{ open: boolean; member: Member | null }>({ open: false, member: null });
-  const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
+  const [activeMemberId, setActiveMemberId] = useState<string | null>(() => localStorage.getItem(memberIdentityKey));
   const [shareOpen, setShareOpen] = useState(false);
   const [crop, setCrop] = useState<{ open: boolean; src: string | null }>({ open: false, src: null });
   const fileRef = useRef<HTMLInputElement>(null);
@@ -36,6 +37,10 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
     if (!ready) return;
     openTrip(id, editKey);
   }, [ready, id, editKey, openTrip]);
+
+  useEffect(() => {
+    setActiveMemberId(localStorage.getItem(memberIdentityKey));
+  }, [memberIdentityKey]);
 
   useEffect(
     () => () => {
@@ -69,6 +74,8 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
   }
 
   const total = trip.expenses.reduce((s, e) => s + e.amount, 0);
+  const verifiedMemberId =
+    activeMemberId && trip.members.some((member) => member.id === activeMemberId) ? activeMemberId : null;
 
   function onPickFile(ev: React.ChangeEvent<HTMLInputElement>) {
     const f = ev.target.files?.[0];
@@ -101,6 +108,16 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
     );
     if (!members.some((member) => member.id === memberId)) throw new Error('Thành viên không còn trong chuyến đi.');
     await saveTrip({ ...trip, members });
+  }
+
+  function verifyMember(memberId: string) {
+    try {
+      localStorage.setItem(memberIdentityKey, memberId);
+      setActiveMemberId(memberId);
+    } catch (error) {
+      console.error('Không lưu được thành viên đã xác nhận trên thiết bị:', error);
+      toast.error(t('identitySaveFailed'));
+    }
   }
 
   return (
@@ -186,7 +203,7 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
             <ExpensesTab trip={trip} onOpen={setDetail} />
           </TabsContent>
           <TabsContent value="balances">
-            <BalancesTab trip={trip} canEdit={canEdit} memberId={activeMemberId ?? undefined} />
+            <BalancesTab trip={trip} canEdit={canEdit} memberId={verifiedMemberId ?? undefined} />
           </TabsContent>
           <TabsContent value="stats">
             <StatsTab trip={trip} />
@@ -240,8 +257,8 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
       />
       <MemberVerificationDialog
         trip={trip}
-        open={editAccessChecked && !canEdit && !activeMemberId && trip.members.length > 0}
-        onVerify={setActiveMemberId}
+        open={editAccessChecked && !canEdit && !verifiedMemberId && trip.members.length > 0}
+        onVerify={verifyMember}
         onRegister={registerMember}
       />
       <ShareDialog
