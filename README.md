@@ -1,0 +1,43 @@
+# Tình Bạn Và Hóa Đơn, bản 2 (React + TypeScript + Tailwind + shadcn/ui)
+
+Cùng tính năng và cùng định dạng dữ liệu Firestore với bản 1 (chuyến đi cũ vẫn mở được), giao diện làm lại theo phong cách shadcn/ui.
+
+## Chạy
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # ra thư mục dist/ để đưa lên hosting
+npm run preview
+```
+Cần Node 18+.
+
+## Có gì mới
+- **Căn chỉnh ảnh nền**: nút "Căn chỉnh ảnh nền" trên ảnh bìa. Kéo ảnh để di chuyển, kéo thanh trượt hoặc chụm hai ngón để phóng to. Khung căn chỉnh có cùng tỉ lệ 16:9 với ảnh bìa và thẻ ngoài danh sách nên ảnh hiển thị đúng như bạn thấy lúc canh. Mở lại nút đó để chỉnh tiếp, hoặc chọn ảnh khác.
+- Giao diện kiểu shadcn/ui: hộp thoại dạng bottom sheet trên iPhone, avatar, badge, thanh thống kê, chế độ sáng/tối tự động.
+- TypeScript chặt (`strict`), tách logic (`src/lib`) khỏi giao diện (`src/components`).
+
+## Cấu trúc
+| Đường dẫn | Vai trò |
+|---|---|
+| `src/firebase-config.ts` | Cấu hình Firebase của bạn |
+| `src/lib/calc.ts` | Tính phần chia, số dư, rút gọn nợ, thống kê |
+| `src/lib/store.ts` | IndexedDB (offline) + Firestore (đồng bộ) |
+| `src/lib/trips.tsx` | State toàn app: chuyến đi, quyền chỉnh sửa, đồng bộ |
+| `src/lib/i18n.tsx` | Tiếng Việt / English |
+| `src/components/ui/*` | Thành phần kiểu shadcn (Button, Dialog, Tabs, ...) |
+| `src/components/BgCropper.tsx` | Căn chỉnh ảnh nền |
+| `src/components/TripView.tsx`, `TripTabs.tsx` | Màn hình chuyến đi |
+
+Các thành phần trong `src/components/ui` được viết tay theo đúng mẫu của shadcn/ui (Radix + Tailwind + cva). Nếu muốn thêm thành phần khác, chạy `npx shadcn@latest init` rồi `npx shadcn@latest add <tên>`; alias `@/` đã cấu hình sẵn.
+
+## Đưa lên mạng (cần https cho iPhone)
+Kéo-thả thư mục `dist/` lên Netlify, hoặc dùng Firebase Hosting / GitHub Pages. Vì dùng đường dẫn dạng `#/t/...` và `base: './'`, không cần cấu hình rewrite.
+Trên iPhone: mở bằng Safari, Chia sẻ, **Thêm vào Màn hình chính**.
+
+## Firestore rules
+Dán `firestore.rules` vào Firebase Console, mục Firestore Database, tab Rules.
+
+## Lưu ý
+- Link chỉnh sửa chứa khóa bí mật, chỉ giữ cho trưởng nhóm.
+- Bảo mật ở mức đơn giản (xem ghi chú trong bản 1): giao diện chặn sửa khi không có khóa, nhưng rules chưa chặn ghi từ người biết ID chuyến đi.
+- Ảnh bìa lưu chung trong tài liệu chuyến đi (khoảng 80–150 KB), ảnh hóa đơn lưu riêng.
