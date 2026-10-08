@@ -18,10 +18,11 @@ interface Props {
 
 export function MemberVerificationDialog({ trip, open, onOpenChange, onVerify, onRegister }: Props) {
   const { t } = useI18n();
-  const [selectedId, setSelectedId] = useState(trip.members[0]?.id ?? '');
+  const availableMembers = trip.members.filter((item) => !item.identityClaimed);
+  const [selectedId, setSelectedId] = useState('');
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const member = trip.members.find((m) => m.id === selectedId) ?? trip.members[0];
+  const member = availableMembers.find((m) => m.id === selectedId) ?? availableMembers[0];
   const isRegistered = !!member?.verification;
 
   async function submit(event: React.FormEvent) {
@@ -59,7 +60,7 @@ export function MemberVerificationDialog({ trip, open, onOpenChange, onVerify, o
           <DialogTitle>{t('memberVerifyTitle')}</DialogTitle>
           <DialogDescription>{t('memberVerifyDescription')}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={submit} className="space-y-4">
+        {member ? <form onSubmit={submit} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="verify-member">{t('selectMember')}</Label>
             <NativeSelect
@@ -71,7 +72,7 @@ export function MemberVerificationDialog({ trip, open, onOpenChange, onVerify, o
                 setAnswer('');
               }}
             >
-              {trip.members.map((item) => (
+              {availableMembers.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
@@ -81,7 +82,7 @@ export function MemberVerificationDialog({ trip, open, onOpenChange, onVerify, o
           {isRegistered ? (
             <div className="space-y-1.5">
               <Label>{t('securityQuestion')}</Label>
-              <p className="rounded-md bg-muted px-3 py-2 text-sm">{member?.verification?.question}</p>
+              <p className="rounded-md bg-muted px-3 py-2 text-sm">{member.verification?.question}</p>
             </div>
           ) : (
             <div className="space-y-1.5">
@@ -111,6 +112,7 @@ export function MemberVerificationDialog({ trip, open, onOpenChange, onVerify, o
             <Button type="submit">{t(isRegistered ? 'verify' : 'saveAndContinue')}</Button>
           </DialogFooter>
         </form>
+        : <p className="rounded-md bg-muted px-3 py-3 text-sm text-muted-foreground">{t('noAvailableMembers')}</p>}
       </DialogContent>
     </Dialog>
   );

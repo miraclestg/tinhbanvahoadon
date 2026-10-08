@@ -56,6 +56,7 @@ function CreateForm({ onClose }: { onClose: () => void }) {
     const tripMembers = parseMembers(members.join('\n'));
     const creatorOptionIndex = creatorOptions.findIndex((member) => String(member.index) === selectedCreatorIndex);
     const creator = creatorOptionIndex >= 0 ? tripMembers[creatorOptionIndex] : undefined;
+    if (creator) creator.identityClaimed = true;
     const id = await createTrip(n, tripMembers, t('logTripNew', n));
     if (creator) {
       try {

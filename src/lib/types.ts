@@ -8,6 +8,7 @@ export interface Member {
   /** Số người trong "hộ". 1 = cá nhân */
   people: number;
   note: string;
+  identityClaimed?: boolean;
   verification?: {
     question: string;
     answerHash: string;

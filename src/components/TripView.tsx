@@ -28,6 +28,7 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
   const [detail, setDetail] = useState<Expense | null>(null);
   const [memberDlg, setMemberDlg] = useState<{ open: boolean; member: Member | null }>({ open: false, member: null });
   const [activeMemberId, setActiveMemberId] = useState<string | null>(() => localStorage.getItem(memberIdentityKey));
+  const [verificationDismissed, setVerificationDismissed] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [crop, setCrop] = useState<{ open: boolean; src: string | null }>({ open: false, src: null });
   const fileRef = useRef<HTMLInputElement>(null);
@@ -41,6 +42,22 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
   useEffect(() => {
     setActiveMemberId(localStorage.getItem(memberIdentityKey));
   }, [memberIdentityKey]);
+
+  useEffect(() => {
+    if (!trip || !canEdit || !activeMemberId) return;
+    const creatorMember = trip.members.find((member) => member.id === activeMemberId);
+    if (creatorMember && !creatorMember.identityClaimed) {
+      void saveTrip({
+        ...trip,
+        members: trip.members.map((member) =>
+          member.id === activeMemberId ? { ...member, identityClaimed: true } : member
+        ),
+      }).catch((error) => {
+        console.error('Không lưu được thành viên người tạo:', error);
+        toast.error(t('verificationSaveFailed'));
+      });
+    }
+  }, [trip, canEdit, activeMemberId, saveTrip, t]);
 
   useEffect(
     () => () => {
@@ -257,9 +274,12 @@ export function TripView({ id, editKey }: { id: string; editKey?: string }) {
       />
       <MemberVerificationDialog
         trip={trip}
-        open={editAccessChecked && !canEdit && !verifiedMemberId && trip.members.length > 0}
+        open={editAccessChecked && !canEdit && !verifiedMemberId && !verificationDismissed && trip.members.length > 0}
         onOpenChange={(open) => {
-          if (!open) setTab('expenses');
+          if (!open) {
+            setVerificationDismissed(true);
+            setTab('expenses');
+          }
         }}
         onVerify={verifyMember}
         onRegister={registerMember}
