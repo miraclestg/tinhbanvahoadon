@@ -117,7 +117,7 @@ export function BalancesTab({ trip, canEdit, memberId }: { trip: Trip; canEdit: 
 
   async function markPaid(i: number) {
     const x = moves[i];
-    if (!x || (memberId ? memberId !== x.from : !canEdit)) return;
+    if (!x || (memberId ? memberId !== x.to : !canEdit)) return;
     await saveTrip(
       { ...trip, payments: [...trip.payments, { id: uid(), from: x.from, to: x.to, amount: x.amount, datetime: nowLocal() }] },
       t('logPay', nameOf(trip, x.from), nameOf(trip, x.to), fmt(x.amount))
@@ -154,7 +154,7 @@ export function BalancesTab({ trip, canEdit, memberId }: { trip: Trip; canEdit: 
                 <Button variant="outline" size="sm" onClick={() => remind(i)}>
                   <Bell /> {t('remind')}
                 </Button>
-                {(memberId ? memberId === x.from : canEdit) && (
+                {(memberId ? memberId === x.to : canEdit) && (
                   <Button size="sm" onClick={() => markPaid(i)}>
                     <Check /> {t('markPaid')}
                   </Button>

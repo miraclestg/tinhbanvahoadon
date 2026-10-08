@@ -41,7 +41,7 @@ Dán `firestore.rules` vào Firebase Console, mục Firestore Database, tab Rule
 
 ## Lưu ý
 - Link chỉnh sửa chứa khóa bí mật, chỉ giữ cho trưởng nhóm.
-- Khi tạo chuyến đi, người tạo có thể chọn tên thành viên của mình; tên này được giữ riêng cho người tạo và lựa chọn trên thiết bị chỉ cho phép đánh dấu khoản người đó đang nợ. Người xem chỉ chọn được tên chưa được người khác chọn; sau lần xác nhận đầu, tên đã chọn được lưu trên thiết bị. Nếu cần xác nhận lại trên thiết bị khác, câu hỏi/câu trả lời sẽ xác minh thành viên.
+- Khi tạo chuyến đi, người tạo có thể chọn tên thành viên của mình; tên này được giữ riêng cho người tạo và lựa chọn trên thiết bị chỉ cho phép đánh dấu đã trả những khoản người đó nhận lại. Người xem chỉ chọn được tên chưa được người khác chọn; sau lần xác nhận đầu, tên đã chọn được lưu trên thiết bị. Nếu cần xác nhận lại trên thiết bị khác, câu hỏi/câu trả lời sẽ xác minh thành viên.
 - Xác nhận thành viên bằng câu hỏi bảo mật chỉ khóa thao tác trong giao diện. Câu trả lời được lưu dưới dạng SHA-256 cùng chuyến đi; người có link vẫn có thể bỏ qua giao diện hoặc dò câu trả lời. Không dùng chức năng này như một cơ chế bảo mật.
 - Firestore Rules cho phép người biết ID chuyến đi đọc/ghi dữ liệu; không chia sẻ link với người không tin cậy.
 - Ảnh bìa lưu chung trong tài liệu chuyến đi (khoảng 80–150 KB), ảnh hóa đơn lưu riêng.
