@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { Input, NativeSelect } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useI18n } from '@/lib/i18n';
 import { useTrips } from '@/lib/trips';
@@ -41,12 +41,30 @@ function CreateForm({ onClose }: { onClose: () => void }) {
   const { createTrip } = useTrips();
   const [name, setName] = useState('');
   const [members, setMembers] = useState(['']);
+  const [creatorMemberIndex, setCreatorMemberIndex] = useState('');
+  const creatorOptions = members
+    .map((member, index) => ({ index, name: member.trim() }))
+    .filter((member) => member.name);
+  const selectedCreatorIndex = creatorOptions.some((member) => String(member.index) === creatorMemberIndex)
+    ? creatorMemberIndex
+    : String(creatorOptions[0]?.index ?? '');
 
   async function submit(ev: React.FormEvent) {
     ev.preventDefault();
     const n = name.trim();
     if (!n) return toast.error(t('errName'));
-    const id = await createTrip(n, parseMembers(members.join('\n')), t('logTripNew', n));
+    const tripMembers = parseMembers(members.join('\n'));
+    const creatorOptionIndex = creatorOptions.findIndex((member) => String(member.index) === selectedCreatorIndex);
+    const creator = creatorOptionIndex >= 0 ? tripMembers[creatorOptionIndex] : undefined;
+    const id = await createTrip(n, tripMembers, t('logTripNew', n));
+    if (creator) {
+      try {
+        localStorage.setItem(`verified-member:${id}`, creator.id);
+      } catch (error) {
+        console.error('Không lưu được thành viên người tạo trên thiết bị:', error);
+        toast.error(t('identitySaveFailed'));
+      }
+    }
     onClose();
     location.hash = `#/t/${id}`;
   }
@@ -75,6 +93,22 @@ function CreateForm({ onClose }: { onClose: () => void }) {
         <Button type="button" variant="outline" size="sm" onClick={() => setMembers((current) => [...current, ''])}>
           <Plus /> {t('addMember')}
         </Button>
+        {creatorOptions.length > 0 && (
+          <div className="space-y-1.5">
+            <Label htmlFor="creator-member">{t('creatorMember')}</Label>
+            <NativeSelect
+              id="creator-member"
+              value={selectedCreatorIndex}
+              onChange={(event) => setCreatorMemberIndex(event.target.value)}
+            >
+              {creatorOptions.map((member) => (
+                <option key={member.index} value={member.index}>
+                  {member.name}
+                </option>
+              ))}
+            </NativeSelect>
+          </div>
+        )}
       </div>
       <DialogFooter>
         <Button type="submit">{t('create')}</Button>
