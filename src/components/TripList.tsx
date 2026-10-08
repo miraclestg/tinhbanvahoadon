@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Languages, Moon, Plus, Sun, Users } from 'lucide-react';
+import { toast } from 'sonner';
 import { CreateTripDialog } from '@/components/CreateTripDialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { fmt } from '@/lib/calc';
 import { useI18n } from '@/lib/i18n';
 import { useTrips } from '@/lib/trips';
@@ -10,7 +12,23 @@ export function TripList() {
   const { t, lang, setLang, theme, toggleTheme } = useI18n();
   const { trips, ready } = useTrips();
   const [creating, setCreating] = useState(false);
+  const [sharedLink, setSharedLink] = useState('');
   const list = Object.values(trips).sort((a, b) => b.createdAt - a.createdAt);
+
+  function openSharedTrip(ev: FormEvent<HTMLFormElement>) {
+    ev.preventDefault();
+    try {
+      const url = new URL(sharedLink.trim(), location.href);
+      const match = url.hash.match(/^#\/t\/([\w-]+)(?:\/([\w-]+))?$/);
+      if (url.origin !== location.origin || url.pathname !== location.pathname || !match) {
+        toast.error(t('invalidTripLink'));
+        return;
+      }
+      location.hash = `#/t/${match[1]}${match[2] ? `/${match[2]}` : ''}`;
+    } catch {
+      toast.error(t('invalidTripLink'));
+    }
+  }
 
   return (
     <div className="pb-28">
@@ -37,6 +55,24 @@ export function TripList() {
           </Button>
         </div>
       </header>
+
+      <form onSubmit={openSharedTrip} className="space-y-2 px-4 pb-4">
+        <label htmlFor="shared-trip-link" className="text-sm font-medium">
+          {t('pasteTripLink')}
+        </label>
+        <div className="flex gap-2">
+          <Input
+            id="shared-trip-link"
+            value={sharedLink}
+            onChange={(e) => setSharedLink(e.target.value)}
+            placeholder={t('pasteTripLinkPlaceholder')}
+            autoComplete="url"
+          />
+          <Button type="submit" disabled={!sharedLink.trim()}>
+            {t('openTrip')}
+          </Button>
+        </div>
+      </form>
 
       <main className="grid gap-4 px-4 sm:grid-cols-2">
         {ready && list.length === 0 && (
