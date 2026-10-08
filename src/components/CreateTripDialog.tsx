@@ -25,7 +25,7 @@ export function CreateTripDialog({ open, onOpenChange }: { open: boolean; onOpen
   const { t } = useI18n();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent onOpenAutoFocus={(event) => event.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{t('newTrip')}</DialogTitle>
         </DialogHeader>
@@ -54,7 +54,7 @@ function CreateForm({ onClose }: { onClose: () => void }) {
     <form onSubmit={submit} className="space-y-4">
       <div className="space-y-1.5">
         <Label>{t('tripName')}</Label>
-        <Input required autoFocus value={name} onChange={(e) => setName(e.target.value)} />
+        <Input required value={name} onChange={(e) => setName(e.target.value)} />
       </div>
       <div className="space-y-1.5">
         <Label>{t('membersLines')}</Label>
