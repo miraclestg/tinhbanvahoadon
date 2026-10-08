@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 
 const technologies = ['React', 'TypeScript', 'Tailwind CSS', 'Vite'];
@@ -17,7 +17,26 @@ const eggOffsets = [
 export function AppFooter() {
   const { t } = useI18n();
   const nextEggRun = useRef(0);
+  const activeSounds = useRef(new Set<HTMLAudioElement>());
   const [eggRuns, setEggRuns] = useState<number[]>([]);
+
+  useEffect(
+    () => () => {
+      activeSounds.current.forEach((sound) => sound.pause());
+      activeSounds.current.clear();
+    },
+    []
+  );
+
+  function playEggSound() {
+    const sound = new Audio('/boom.mp3');
+    activeSounds.current.add(sound);
+    sound.onended = () => activeSounds.current.delete(sound);
+    void sound.play().catch((error: unknown) => {
+      console.error('Unable to play the easter egg sound.', error);
+      activeSounds.current.delete(sound);
+    });
+  }
 
   return (
     <footer className="mt-auto border-t bg-card/70">
@@ -26,6 +45,7 @@ export function AppFooter() {
           type="button"
           aria-label={t('footerEasterEgg')}
           onClick={() => {
+            playEggSound();
             const run = nextEggRun.current++;
             setEggRuns((runs) => [...runs, run]);
           }}
