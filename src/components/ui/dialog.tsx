@@ -7,13 +7,17 @@ export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
 
+type DialogContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+  overlayClassName?: string;
+};
+
 /** Trên điện thoại hiện như bottom sheet, trên máy tính là hộp thoại giữa màn hình */
 export const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DialogContentProps
+>(({ className, overlayClassName, children, ...props }, ref) => (
   <DialogPrimitive.Portal>
-    <DialogPrimitive.Overlay className="anim-fade fixed inset-0 z-50 bg-black/55" />
+    <DialogPrimitive.Overlay className={cn('anim-fade fixed inset-0 z-50 bg-black/55', overlayClassName)} />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(

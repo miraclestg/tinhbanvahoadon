@@ -109,3 +109,14 @@
 }
 .anim-sheet { animation: sheet-in 0.2s ease-out; }
 .anim-fade { animation: fade-in 0.15s ease-out; }
+
+@keyframes egg-image-reveal {
+  0% { opacity: 1; transform: scale(0.08); }
+  30% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.12); }
+}
+.egg-image-reveal { animation: egg-image-reveal 2s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .egg-image-reveal { animation-duration: 0.01ms; }
+}

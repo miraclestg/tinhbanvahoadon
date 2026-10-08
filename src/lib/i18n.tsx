@@ -10,7 +10,7 @@ const D: Record<Lang, Dict> = {
   vi: {
     app: 'Tình Bạn Và Hóa Đơn',
     themeLight: 'Chuyển sang giao diện sáng', themeDark: 'Chuyển sang giao diện tối',
-    footerLinks: 'Liên kết nhanh', footerHome: 'Trang chủ',
+    footerLinks: 'Liên kết nhanh', footerHome: 'Trang chủ', footerEasterEgg: 'Trứng phục sinh',
     footerBuiltWith: 'Được xây dựng với', footerRights: 'Đã đăng ký bản quyền.',
     newTrip: 'Chuyến đi mới', tripName: 'Tên chuyến đi', trips: 'Chuyến đi',
     noTrips: 'Chưa có chuyến đi nào.',
@@ -60,7 +60,7 @@ const D: Record<Lang, Dict> = {
   en: {
     app: 'Friends & Bills',
     themeLight: 'Switch to light mode', themeDark: 'Switch to dark mode',
-    footerLinks: 'Quick Links', footerHome: 'Home',
+    footerLinks: 'Quick Links', footerHome: 'Home', footerEasterEgg: 'Easter egg',
     footerBuiltWith: 'Built With', footerRights: 'All rights reserved.',
     newTrip: 'New trip', tripName: 'Trip name', trips: 'Trips',
     noTrips: 'No trips yet.',
