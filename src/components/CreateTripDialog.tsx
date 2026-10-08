@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input, Textarea } from '@/components/ui/input';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useI18n } from '@/lib/i18n';
 import { useTrips } from '@/lib/trips';
@@ -39,13 +40,13 @@ function CreateForm({ onClose }: { onClose: () => void }) {
   const { t } = useI18n();
   const { createTrip } = useTrips();
   const [name, setName] = useState('');
-  const [members, setMembers] = useState('');
+  const [members, setMembers] = useState(['']);
 
   async function submit(ev: React.FormEvent) {
     ev.preventDefault();
     const n = name.trim();
     if (!n) return toast.error(t('errName'));
-    const id = await createTrip(n, parseMembers(members), t('logTripNew', n));
+    const id = await createTrip(n, parseMembers(members.join('\n')), t('logTripNew', n));
     onClose();
     location.hash = `#/t/${id}`;
   }
@@ -58,7 +59,22 @@ function CreateForm({ onClose }: { onClose: () => void }) {
       </div>
       <div className="space-y-1.5">
         <Label>{t('membersLines')}</Label>
-        <Textarea rows={5} value={members} onChange={(e) => setMembers(e.target.value)} />
+        <div className="space-y-2">
+          {members.map((member, index) => (
+            <Input
+              key={index}
+              aria-label={`${t('name')} ${index + 1}`}
+              placeholder={`${t('name')} ${index + 1}`}
+              value={member}
+              onChange={(e) =>
+                setMembers((current) => current.map((value, i) => (i === index ? e.target.value : value)))
+              }
+            />
+          ))}
+        </div>
+        <Button type="button" variant="outline" size="sm" onClick={() => setMembers((current) => [...current, ''])}>
+          <Plus /> {t('addMember')}
+        </Button>
       </div>
       <DialogFooter>
         <Button type="submit">{t('create')}</Button>
